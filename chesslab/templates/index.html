@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChessLab</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--surface:#141414;--surface2:#1c1c1c;--surface3:#242424;
+  --accent:#c8a84b;--accent2:#e8c876;--text:#f0f0f0;--muted:#666;--muted2:#888;
+  --light-sq:#f0d9b5;--dark-sq:#b58863;
+  --selected:rgba(127,201,127,0.85);--hint:rgba(106,176,76,0.7);
+  --correct:#27ae60;--wrong:#e74c3c;--border:#252525;
+  --info:#3498db;
+}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+
+/* ── LAYOUT ── */
+.app{display:flex;flex-direction:column;min-height:100vh}
+.header{display:flex;align-items:center;gap:1rem;padding:1rem 1.5rem;border-bottom:1px solid var(--border);background:var(--surface)}
+.logo{font-size:18px;font-weight:800;color:var(--accent);letter-spacing:-1px}
+.logo span{color:var(--text);font-weight:400}
+.user-badge{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted2)}
+.user-dot{width:8px;height:8px;border-radius:50%;background:var(--correct)}
+
+.tabs{display:flex;gap:2px;padding:0 1.5rem;background:var(--surface);border-bottom:1px solid var(--border)}
+.tab{padding:10px 18px;border:none;background:transparent;color:var(--muted2);font-family:'Syne',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+.content{flex:1;padding:1.5rem;max-width:1100px;margin:0 auto;width:100%}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+.card-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* ── STAT CARDS ── */
+.stat{background:var(--surface2);border-radius:10px;padding:14px;text-align:center}
+.stat-val{font-size:28px;font-weight:800;color:var(--accent)}
+.stat-lbl{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 18px;border-radius:8px;border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:var(--accent2)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--surface3)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+
+/* ── IMPORT SECTION ── */
+.import-box{display:flex;gap:10px;align-items:center;margin-bottom:1.5rem}
+.input{padding:9px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Syne',sans-serif;font-size:13px;flex:1}
+.input:focus{outline:none;border-color:var(--accent)}
+.input::placeholder{color:var(--muted)}
+
+/* ── WEAKNESS LIST ── */
+.weakness-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all 0.2s}
+.weakness-item:hover{border-color:var(--accent)}
+.weakness-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.weakness-name{font-size:14px;font-weight:600;color:var(--text)}
+.weakness-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
+.badge-bad{background:rgba(231,76,60,0.15);color:#e74c3c;border:1px solid rgba(231,76,60,0.3)}
+.badge-ok{background:rgba(52,152,219,0.15);color:#3498db;border:1px solid rgba(52,152,219,0.3)}
+.badge-good{background:rgba(39,174,96,0.15);color:#27ae60;border:1px solid rgba(39,174,96,0.3)}
+.bar-track{height:5px;background:var(--surface3);border-radius:3px;overflow:hidden;margin:4px 0}
+.bar-fill{height:100%;border-radius:3px;transition:width 0.6s ease}
+.bar-win{background:var(--correct)}
+.bar-loss{background:var(--wrong)}
+.bar-draw{background:var(--info)}
+.wk-stats{display:flex;gap:16px;font-size:12px;color:var(--muted2)}
+.wk-stat{display:flex;align-items:center;gap:4px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* ── BOARD ── */
+.board-layout{display:grid;grid-template-columns:auto 1fr;gap:1.5rem;align-items:start}
+.board-wrap{display:flex;gap:0}
+.rank-labels{display:flex;flex-direction:column;justify-content:space-around;padding-right:4px}
+.rank-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);height:52px;display:flex;align-items:center;justify-content:center;width:16px}
+#board{display:grid;grid-template-columns:repeat(8,52px);grid-template-rows:repeat(8,52px);border:2px solid var(--border);border-radius:4px;overflow:hidden}
+.sq{width:52px;height:52px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:32px;user-select:none;position:relative;transition:filter 0.1s}
+.sq.light{background:var(--light-sq)}
+.sq.dark{background:var(--dark-sq)}
+.sq.selected{outline:3px solid var(--selected);outline-offset:-3px;z-index:1}
+.sq.hint::after{content:'';width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,0.2);position:absolute}
+.sq.hint.occupied::after{width:48px;height:48px;border-radius:0;border:3px solid rgba(0,0,0,0.25);background:transparent}
+.sq.last-from{background:rgba(200,168,75,0.4)!important}
+.sq.last-to{background:rgba(200,168,75,0.55)!important}
+.sq:hover{filter:brightness(1.08)}
+.file-labels{display:flex;padding-left:20px}
+.file-lbl{width:52px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);padding-top:4px}
+
+/* ── MOVES PANEL ── */
+.moves-scroll{max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:3px}
+.move-row{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:12px}
+.move-num{color:var(--muted);min-width:22px}
+.move-pill{padding:3px 9px;border-radius:5px;background:var(--surface2);color:var(--text)}
+.move-pill.current{background:var(--accent);color:#000;font-weight:600}
+.move-pill.done{color:var(--muted2)}
+
+/* ── STATUS ── */
+.status{padding:10px 14px;border-radius:8px;background:var(--surface2);font-size:13px;border-left:3px solid var(--accent);min-height:40px;display:flex;align-items:center}
+.status.ok{border-left-color:var(--correct);background:rgba(39,174,96,0.08)}
+.status.err{border-left-color:var(--wrong);background:rgba(231,76,60,0.08)}
+
+/* ── PROGRESS BAR ── */
+.prog-bar{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;margin:8px 0 4px}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.4s}
+
+/* ── OPENING BTNS ── */
+.op-btn{padding:8px 12px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;text-align:left;transition:all 0.15s;width:100%;margin-bottom:6px}
+.op-btn:hover,.op-btn.active{border-color:var(--accent);color:var(--accent)}
+.op-btn.active{background:rgba(200,168,75,0.08);font-weight:600}
+
+/* ── PUZZLE ── */
+.puzzle-grid{display:grid;grid-template-columns:auto 1fr;gap:1.5rem;align-items:start}
+
+/* ── LOADING ── */
+.loading{display:flex;align-items:center;gap:10px;color:var(--muted2);font-size:13px;padding:1rem}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── TURN INDICATOR ── */
+.turn-ind{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted2)}
+.turn-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--border)}
+
+.section{display:none}
+.section.active{display:block}
+
+/* ── RESPONSIVE ── */
+@media(max-width:700px){
+  .board-layout,.puzzle-grid{grid-template-columns:1fr}
+  #board{grid-template-columns:repeat(8,40px);grid-template-rows:repeat(8,40px)}
+  .sq{width:40px;height:40px;font-size:25px}
+  .file-lbl{width:40px}
+  .rank-lbl{height:40px}
+  .grid3{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">CHESS<span>LAB</span></div>
+    <div class="user-badge" id="user-badge" style="display:none">
+      <div class="user-dot"></div>
+      <span id="badge-name"></span>
+      <span id="badge-games" style="color:var(--muted)"></span>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('dashboard')">Dashboard</button>
+    <button class="tab" onclick="switchTab('openings')">Aberturas</button>
+    <button class="tab" onclick="switchTab('puzzles')">Puzzles</button>
+    <button class="tab" onclick="switchTab('free')">Jogo Livre</button>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div id="tab-dashboard" class="section active">
+      <div class="card" style="margin-bottom:1rem">
+        <div class="card-title">Importar partidas do Chess.com</div>
+        <div class="import-box">
+          <input class="input" id="username-input" placeholder="O teu username no Chess.com" />
+          <button class="btn btn-primary" onclick="importGames()">Importar</button>
+        </div>
+        <div id="import-status"></div>
+      </div>
+
+      <div id="dashboard-data" style="display:none">
+        <div class="grid3" style="margin-bottom:1rem">
+          <div class="stat"><div class="stat-val" id="stat-total">0</div><div class="stat-lbl">Partidas</div></div>
+          <div class="stat"><div class="stat-val" id="stat-wins">0</div><div class="stat-lbl">Vitórias</div></div>
+          <div class="stat"><div class="stat-val" id="stat-weak">0</div><div class="stat-lbl">Pontos fracos</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">As tuas aberturas mais fracas — treina estas primeiro</div>
+          <div id="weakness-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ABERTURAS ══ -->
+    <div id="tab-openings" class="section">
+      <div class="board-layout">
+        <div>
+          <div class="board-wrap">
+            <div class="rank-labels" id="op-rank-labels"></div>
+            <div>
+              <div id="board"></div>
+              <div class="file-labels" id="op-file-labels"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="card">
+            <div class="card-title">Aberturas</div>
+            <div id="op-list"></div>
+          </div>
+          <div class="card">
+            <div style="font-size:15px;font-weight:700;color:var(--accent);margin-bottom:4px" id="op-name">—</div>
+            <div style="font-size:12px;color:var(--muted2);line-height:1.5;margin-bottom:10px" id="op-desc"></div>
+            <div class="prog-bar"><div class="prog-fill" id="op-prog" style="width:0%"></div></div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px" id="op-step"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Sequência</div>
+            <div class="moves-scroll" id="op-moves"></div>
+          </div>
+          <div class="status" id="op-status">Escolhe uma abertura</div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="opPrev()">← Voltar</button>
+            <button class="btn btn-primary" onclick="opReset()">Reiniciar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PUZZLES ══ -->
+    <div id="tab-puzzles" class="section">
+      <div class="puzzle-grid">
+        <div>
+          <div class="board-wrap">
+            <div class="rank-labels" id="pz-rank-labels"></div>
+            <div>
+              <div id="puzzle-board"></div>
+              <div class="file-labels" id="pz-file-labels"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="grid2">
+            <div class="stat"><div class="stat-val" id="pz-correct">0</div><div class="stat-lbl">Corretos</div></div>
+            <div class="stat"><div class="stat-val" id="pz-wrong">0</div><div class="stat-lbl">Errados</div></div>
+          </div>
+          <div class="card">
+            <div style="font-size:15px;font-weight:700;color:var(--accent);margin-bottom:4px" id="pz-title">Puzzle #1</div>
+            <div style="font-size:12px;color:var(--muted2)" id="pz-desc">Brancas jogam. Encontra o melhor lance.</div>
+          </div>
+          <div class="status" id="pz-status">Clica numa peça para jogar</div>
+          <div class="turn-ind">
+            <div class="turn-dot" id="pz-turn-dot" style="background:#f0f0f0"></div>
+            <span id="pz-turn-text">Brancas jogam</span>
+          </div>
+          <button class="btn btn-primary" onclick="nextPuzzle()">Próximo puzzle →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ JOGO LIVRE ══ -->
+    <div id="tab-free" class="section">
+      <div class="board-layout">
+        <div>
+          <div class="board-wrap">
+            <div class="rank-labels" id="fr-rank-labels"></div>
+            <div>
+              <div id="free-board"></div>
+              <div class="file-labels" id="fr-file-labels"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="card">
+            <div class="card-title">Jogo Livre</div>
+            <div style="font-size:12px;color:var(--muted2)">Estuda posições livremente.</div>
+          </div>
+          <div class="turn-ind">
+            <div class="turn-dot" id="fr-turn-dot" style="background:#f0f0f0"></div>
+            <span id="fr-turn-text">Vez das Brancas</span>
+          </div>
+          <div class="card">
+            <div class="card-title">Lances</div>
+            <div class="moves-scroll" id="fr-moves"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary" onclick="frUndo()">← Undo</button>
+            <button class="btn btn-primary" onclick="frNew()">Nova partida</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const PIECES={wK:'♔',wQ:'♕',wR:'♖',wB:'♗',wN:'♘',wP:'♙',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'};
+const API='http://localhost:5000/api';
+
+// ── CHESS LOGIC ──
+function freshBoard(){
+  const b=Array(8).fill(null).map(()=>Array(8).fill(null));
+  const back=['R','N','B','Q','K','B','N','R'];
+  for(let i=0;i<8;i++){b[0][i]='b'+back[i];b[1][i]='bP';b[6][i]='wP';b[7][i]='w'+back[i];}
+  return b;
+}
+function getLegal(board,r,c){
+  const piece=board[r][c]; if(!piece)return[];
+  const color=piece[0],type=piece[1],moves=[];
+  const ok=(r,c)=>r>=0&&r<8&&c>=0&&c<8;
+  const enemy=(r,c)=>board[r][c]&&board[r][c][0]!==color;
+  const empty=(r,c)=>!board[r][c];
+  if(type==='P'){const d=color==='w'?-1:1,sr=color==='w'?6:1;
+    if(ok(r+d,c)&&empty(r+d,c)){moves.push([r+d,c]);if(r===sr&&empty(r+2*d,c))moves.push([r+2*d,c]);}
+    [[d,-1],[d,1]].forEach(([dr,dc])=>{if(ok(r+dr,c+dc)&&enemy(r+dr,c+dc))moves.push([r+dr,c+dc]);});}
+  if(type==='N'){[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]].forEach(([dr,dc])=>{const nr=r+dr,nc=c+dc;if(ok(nr,nc)&&(empty(nr,nc)||enemy(nr,nc)))moves.push([nr,nc]);});}
+  if(type==='K'){for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){if(!dr&&!dc)continue;const nr=r+dr,nc=c+dc;if(ok(nr,nc)&&(empty(nr,nc)||enemy(nr,nc)))moves.push([nr,nc]);}}
+  const slide=dirs=>dirs.forEach(([dr,dc])=>{let nr=r+dr,nc=c+dc;while(ok(nr,nc)){if(empty(nr,nc)){moves.push([nr,nc]);nr+=dr;nc+=dc;}else{if(enemy(nr,nc))moves.push([nr,nc]);break;}}});
+  if(type==='R')slide([[0,1],[0,-1],[1,0],[-1,0]]);
+  if(type==='B')slide([[1,1],[1,-1],[-1,1],[-1,-1]]);
+  if(type==='Q'){slide([[0,1],[0,-1],[1,0],[-1,0]]);slide([[1,1],[1,-1],[-1,1],[-1,-1]]);}
+  return moves;
+}
+function toAlg(r,c){return 'abcdefgh'[c]+(8-r);}
+
+function renderBoardEl(boardData,elId,selected,lastMove,hints,clickFn){
+  const el=document.getElementById(elId); if(!el)return;
+  el.innerHTML='';
+  const rankId=elId==='board'?'op-rank-labels':elId==='puzzle-board'?'pz-rank-labels':'fr-rank-labels';
+  const fileId=elId==='board'?'op-file-labels':elId==='puzzle-board'?'pz-file-labels':'fr-file-labels';
+  const rankEl=document.getElementById(rankId); if(rankEl){rankEl.innerHTML='';for(let r=0;r<8;r++){const l=document.createElement('div');l.className='rank-lbl';l.textContent=8-r;rankEl.appendChild(l);}}
+  const fileEl=document.getElementById(fileId); if(fileEl){fileEl.innerHTML='';'abcdefgh'.split('').forEach(f=>{const l=document.createElement('div');l.className='file-lbl';l.textContent=f;fileEl.appendChild(l);});}
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+    const sq=document.createElement('div');
+    sq.className='sq '+((r+c)%2===0?'light':'dark');
+    if(boardData[r][c])sq.textContent=PIECES[boardData[r][c]]||'';
+    if(selected&&selected[0]===r&&selected[1]===c)sq.classList.add('selected');
+    if(lastMove){if(lastMove[0]===r&&lastMove[1]===c)sq.classList.add('last-from');if(lastMove[2]===r&&lastMove[3]===c)sq.classList.add('last-to');}
+    if(hints&&hints.some(h=>h[0]===r&&h[1]===c)){sq.classList.add('hint');if(boardData[r][c])sq.classList.add('occupied');}
+    sq.onclick=()=>clickFn(r,c);
+    el.appendChild(sq);
+  }
+}
+
+// ── DASHBOARD / IMPORT ──
+async function importGames(){
+  const username=document.getElementById('username-input').value.trim();
+  if(!username)return;
+  const statusEl=document.getElementById('import-status');
+  statusEl.innerHTML='<div class="loading"><div class="spinner"></div>A importar partidas (pode demorar alguns segundos)...</div>';
+  try{
+    const res=await fetch(`${API}/import`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});
+    const data=await res.json();
+    if(!res.ok){statusEl.innerHTML=`<div class="status err">${data.error}</div>`;return;}
+    statusEl.innerHTML=`<div class="status ok">✓ ${data.total_games} partidas importadas de <strong>${username}</strong></div>`;
+    renderDashboard(data);
+    document.getElementById('badge-name').textContent=username;
+    document.getElementById('badge-games').textContent=`${data.total_games} partidas`;
+    document.getElementById('user-badge').style.display='flex';
+  }catch(e){statusEl.innerHTML='<div class="status err">Erro: certifica-te que o backend Flask está a correr (python app.py)</div>';}
+}
+
+function renderDashboard(data){
+  document.getElementById('stat-total').textContent=data.total_games;
+  document.getElementById('stat-wins').textContent=data.wins;
+  document.getElementById('stat-weak').textContent=data.weaknesses.length;
+  const list=document.getElementById('weakness-list');
+  list.innerHTML='';
+  if(!data.weaknesses.length){list.innerHTML='<div style="color:var(--muted2);font-size:13px">Não há dados suficientes ainda.</div>';return;}
+  data.weaknesses.forEach(w=>{
+    const div=document.createElement('div');
+    div.className='weakness-item';
+    const lossRate=w.loss_rate;
+    const badgeClass=lossRate>=50?'badge-bad':lossRate>=30?'badge-ok':'badge-good';
+    const badgeText=lossRate>=50?'Ponto Fraco':lossRate>=30?'Atenção':'Bom';
+    div.innerHTML=`
+      <div class="weakness-header">
+        <div class="weakness-name">${w.opening}</div>
+        <div class="weakness-badge ${badgeClass}">${badgeText} — ${lossRate}% derrotas</div>
+      </div>
+      <div class="bar-track"><div class="bar-fill bar-win" style="width:${w.win_rate}%"></div></div>
+      <div class="bar-track"><div class="bar-fill bar-loss" style="width:${w.loss_rate}%"></div></div>
+      <div class="wk-stats">
+        <div class="wk-stat"><span class="dot" style="background:var(--correct)"></span>${w.wins}V</div>
+        <div class="wk-stat"><span class="dot" style="background:var(--wrong)"></span>${w.losses}D</div>
+        <div class="wk-stat"><span class="dot" style="background:var(--info)"></span>${w.draws}E</div>
+        <div class="wk-stat">${w.total} partidas</div>
+      </div>`;
+    list.appendChild(div);
+  });
+  document.getElementById('dashboard-data').style.display='block';
+}
+
+// ── OPENINGS TAB ──
+const OPENINGS=[
+  {name:'Italiano',desc:'Desenvolvimento rápido e ataque direto ao rei.',
+   moves:[{from:[6,4],to:[4,4],n:'e4'},{from:[1,4],to:[3,4],n:'e5'},{from:[7,6],to:[5,5],n:'Nf3'},{from:[0,6],to:[2,5],n:'Nc6'},{from:[7,5],to:[4,2],n:'Bc4'}],
+   labels:['e4 — Controlo do centro','e5 — Resposta simétrica','Nf3 — Desenvolve o cavalo','Nc6 — Defende o peão','Bc4 — Bispo Italiano']},
+  {name:'Siciliana',desc:'A resposta mais combativa ao e4.',
+   moves:[{from:[6,4],to:[4,4],n:'e4'},{from:[1,2],to:[3,2],n:'c5'},{from:[7,6],to:[5,5],n:'Nf3'},{from:[1,3],to:[3,3],n:'d6'},{from:[6,3],to:[4,3],n:'d4'}],
+   labels:['e4 — Brancas dominam centro','c5 — Siciliana assimétrica','Nf3 — Desenvolvimento clássico','d6 — Prepara Nf6','d4 — Brancas abrem o centro']},
+  {name:'London System',desc:'Sólido. Bom para construir pressão sem decorar muita teoria.',
+   moves:[{from:[6,3],to:[4,3],n:'d4'},{from:[1,3],to:[3,3],n:'d5'},{from:[7,6],to:[5,5],n:'Nf3'},{from:[0,6],to:[2,5],n:'Nf6'},{from:[7,2],to:[5,3],n:'Bf4'}],
+   labels:['d4 — Abertura clássica','d5 — Resposta simétrica','Nf3 — Desenvolvimento','Nf6 — Pretas desenvolvem','Bf4 — London setup']},
+  {name:'Gambito da Rainha',desc:'Clássico. Brancas oferecem peão para ganhar o centro.',
+   moves:[{from:[6,3],to:[4,3],n:'d4'},{from:[1,3],to:[3,3],n:'d5'},{from:[6,2],to:[4,2],n:'c4'},{from:[1,4],to:[3,4],n:'e6'},{from:[7,1],to:[5,2],n:'Nc3'}],
+   labels:['d4 — Abertura clássica','d5 — Resposta simétrica','c4 — O gambito!','e6 — Recusa o gambito','Nc3 — Desenvolvimento rápido']},
+];
+
+let opIdx=0,opStep=0,opBoard=[],opSelected=null,opLastMove=null;
+function opInit(){opBoard=freshBoard();opStep=0;opSelected=null;opLastMove=null;}
+function selectOp(i){
+  opIdx=i;opInit();
+  document.querySelectorAll('.op-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+  document.getElementById('op-name').textContent=OPENINGS[i].name;
+  document.getElementById('op-desc').textContent=OPENINGS[i].desc;
+  updateOpPanel();renderBoardEl(opBoard,'board',null,null,null,opClick);
+}
+function opClick(r,c){
+  const op=OPENINGS[opIdx];
+  if(opStep>=op.moves.length)return;
+  const move=op.moves[opStep];
+  const piece=opBoard[r][c];
+  if(opSelected){
+    const[sr,sc]=opSelected;
+    if(r===move.to[0]&&c===move.to[1]&&sr===move.from[0]&&sc===move.from[1]){
+      opBoard[move.to[0]][move.to[1]]=opBoard[move.from[0]][move.from[1]];
+      opBoard[move.from[0]][move.from[1]]=null;
+      opLastMove=[move.from[0],move.from[1],move.to[0],move.to[1]];
+      opStep++;opSelected=null;
+      setOpStatus(op.labels[opStep-1]||'','ok');
+      updateOpPanel();renderBoardEl(opBoard,'board',null,opLastMove,null,opClick);
+    }else if(r===sr&&c===sc){opSelected=null;renderBoardEl(opBoard,'board',null,opLastMove,null,opClick);}
+    else if(piece&&((opStep%2===0&&piece[0]==='w')||(opStep%2===1&&piece[0]==='b'))){
+      opSelected=[r,c];
+      const hints=getLegal(opBoard,r,c);
+      renderBoardEl(opBoard,'board',[r,c],opLastMove,hints,opClick);
+    }else{setOpStatus('Lance incorreto, tenta novamente!','err');opSelected=null;renderBoardEl(opBoard,'board',null,opLastMove,null,opClick);}
+  }else{
+    if(piece&&((opStep%2===0&&piece[0]==='w')||(opStep%2===1&&piece[0]==='b'))){
+      opSelected=[r,c];
+      const hints=getLegal(opBoard,r,c);
+      renderBoardEl(opBoard,'board',[r,c],opLastMove,hints,opClick);
+      if(r!==move.from[0]||c!==move.from[1])setOpStatus('Dica: seleciona a peça certa para este passo','');
+    }
+  }
+}
+function setOpStatus(msg,type){const el=document.getElementById('op-status');el.textContent=msg;el.className='status '+(type||'');}
+function updateOpPanel(){
+  const op=OPENINGS[opIdx];
+  document.getElementById('op-prog').style.width=(opStep/op.moves.length*100)+'%';
+  document.getElementById('op-step').textContent=`Passo ${opStep} / ${op.moves.length}`;
+  const list=document.getElementById('op-moves');list.innerHTML='';
+  for(let i=0;i<op.moves.length;i+=2){
+    const row=document.createElement('div');row.className='move-row';
+    const wm=op.moves[i],bm=op.moves[i+1];
+    const wDone=i<opStep,bDone=i+1<opStep,wCur=i===opStep,bCur=i+1===opStep;
+    row.innerHTML=`<span class="move-num">${i/2+1}.</span><span class="move-pill${wDone?' done':wCur?' current':''}">${wm.n}</span>${bm?`<span class="move-pill${bDone?' done':bCur?' current':''}">${bm.n}</span>`:''}`;
+    list.appendChild(row);
+  }
+  if(opStep>=op.moves.length)setOpStatus('Abertura completa! Excelente!','ok');
+  else if(opStep===0)setOpStatus('Seleciona a peça para o primeiro lance','');
+}
+function opPrev(){
+  if(opStep<=0)return;opStep--;opBoard=freshBoard();
+  const op=OPENINGS[opIdx];
+  for(let i=0;i<opStep;i++){const m=op.moves[i];opBoard[m.to[0]][m.to[1]]=opBoard[m.from[0]][m.from[1]];opBoard[m.from[0]][m.from[1]]=null;}
+  opSelected=null;opLastMove=opStep>0?[op.moves[opStep-1].from[0],op.moves[opStep-1].from[1],op.moves[opStep-1].to[0],op.moves[opStep-1].to[1]]:null;
+  updateOpPanel();setOpStatus('Lance desfeito','');renderBoardEl(opBoard,'board',null,opLastMove,null,opClick);
+}
+function opReset(){selectOp(opIdx);}
+
+// ── PUZZLES ──
+const PUZZLES=[
+  {title:'Mate em 1',desc:'Brancas jogam e dão mate em 1 lance.',
+   setup:b=>{b[7][4]='wK';b[7][7]='wR';b[7][0]='wR';b[0][4]='bK';},
+   sol:[7,7,0,7],solNotation:'Ra8#',hint:'A torre controla toda a coluna',turn:'w'},
+  {title:'Garfo de Cavalo',desc:'Brancas atacam duas peças ao mesmo tempo.',
+   setup:b=>{b[7][4]='wK';b[5][2]='wN';b[0][4]='bK';b[2][1]='bR';b[2][3]='bR';},
+   sol:[5,2,3,3],solNotation:'Nd4!',hint:'O cavalo pode atacar dois alvos',turn:'w'},
+  {title:'Captura Decisiva',desc:'Brancas ganham material com um lance forte.',
+   setup:b=>{b[7][4]='wK';b[5][4]='wQ';b[0][4]='bK';b[2][4]='bQ';b[3][6]='bR';},
+   sol:[5,4,2,4],solNotation:'Qxd6',hint:'A rainha pode capturar com ganho',turn:'w'},
+  {title:'Defesa Forçada',desc:'Pretas salvam o jogo com um lance único.',
+   setup:b=>{b[0][4]='bK';b[7][4]='wK';b[1][0]='bR';b[6][0]='wQ';b[5][5]='wR';},
+   sol:[1,0,6,0],solNotation:'Rxg1!',hint:'A torre pode capturar e criar ameaças',turn:'b'},
+];
+let pzIdx=0,pzCorrect=0,pzWrong=0,pzBoard=[],pzSelected=null,pzSolved=false;
+function loadPuzzle(){
+  const p=PUZZLES[pzIdx%PUZZLES.length];
+  pzBoard=Array(8).fill(null).map(()=>Array(8).fill(null));
+  p.setup(pzBoard);pzSelected=null;pzSolved=false;
+  document.getElementById('pz-title').textContent=p.title;
+  document.getElementById('pz-desc').textContent=p.desc;
+  document.getElementById('pz-status').textContent='Clica numa peça para jogar';
+  document.getElementById('pz-status').className='status';
+  document.getElementById('pz-turn-dot').style.background=p.turn==='w'?'#f0f0f0':'#222';
+  document.getElementById('pz-turn-text').textContent=p.turn==='w'?'Brancas jogam':'Pretas jogam';
+  renderBoardEl(pzBoard,'puzzle-board',null,null,null,pzClick);
+}
+function pzClick(r,c){
+  if(pzSolved)return;
+  const p=PUZZLES[pzIdx%PUZZLES.length];
+  const piece=pzBoard[r][c];
+  if(pzSelected){
+    const[sr,sc]=pzSelected;
+    const sol=p.sol;
+    if(sr===sol[0]&&sc===sol[1]&&r===sol[2]&&c===sol[3]){
+      pzBoard[r][c]=pzBoard[sr][sc];pzBoard[sr][sc]=null;
+      pzSolved=true;pzCorrect++;
+      document.getElementById('pz-correct').textContent=pzCorrect;
+      document.getElementById('pz-status').textContent='✓ Correto! '+p.solNotation+' é o melhor lance!';
+      document.getElementById('pz-status').className='status ok';
+      renderBoardEl(pzBoard,'puzzle-board',null,[sr,sc,r,c],null,pzClick);
+    }else if(r===sr&&c===sc){pzSelected=null;renderBoardEl(pzBoard,'puzzle-board',null,null,null,pzClick);}
+    else if(piece&&piece[0]===p.turn){pzSelected=[r,c];const hints=getLegal(pzBoard,r,c);renderBoardEl(pzBoard,'puzzle-board',[r,c],null,hints,pzClick);}
+    else{pzWrong++;document.getElementById('pz-wrong').textContent=pzWrong;document.getElementById('pz-status').textContent='✗ Errado. Dica: '+p.hint;document.getElementById('pz-status').className='status err';pzSelected=null;renderBoardEl(pzBoard,'puzzle-board',null,null,null,pzClick);}
+  }else{
+    if(piece&&piece[0]===p.turn){pzSelected=[r,c];const hints=getLegal(pzBoard,r,c);renderBoardEl(pzBoard,'puzzle-board',[r,c],null,hints,pzClick);}
+  }
+}
+function nextPuzzle(){pzIdx++;loadPuzzle();}
+
+// ── FREE PLAY ──
+let frBoard=[],frSelected=null,frLastMove=null,frTurn='w',frHistory=[];
+function frInit(){frBoard=freshBoard();frSelected=null;frLastMove=null;frTurn='w';frHistory=[];updateFrPanel();renderBoardEl(frBoard,'free-board',null,null,null,frClick);}
+function frClick(r,c){
+  const piece=frBoard[r][c];
+  if(frSelected){
+    const[sr,sc]=frSelected;
+    const legal=getLegal(frBoard,sr,sc);
+    if(legal.some(m=>m[0]===r&&m[1]===c)){
+      const from=toAlg(sr,sc),to=toAlg(r,c);
+      const notation=(frBoard[sr][sc][1]==='P'?'':frBoard[sr][sc][1])+from+to;
+      frBoard[r][c]=frBoard[sr][sc];frBoard[sr][sc]=null;
+      frLastMove=[sr,sc,r,c];frTurn=frTurn==='w'?'b':'w';
+      frHistory.push({color:frTurn==='w'?'b':'w',san:notation});
+      frSelected=null;updateFrPanel();renderBoardEl(frBoard,'free-board',null,frLastMove,null,frClick);
+    }else if(r===sr&&c===sc){frSelected=null;renderBoardEl(frBoard,'free-board',null,frLastMove,null,frClick);}
+    else if(piece&&piece[0]===frTurn){frSelected=[r,c];const hints=getLegal(frBoard,r,c);renderBoardEl(frBoard,'free-board',[r,c],frLastMove,hints,frClick);}
+    else{frSelected=null;renderBoardEl(frBoard,'free-board',null,frLastMove,null,frClick);}
+  }else{
+    if(piece&&piece[0]===frTurn){frSelected=[r,c];const hints=getLegal(frBoard,r,c);renderBoardEl(frBoard,'free-board',[r,c],frLastMove,hints,frClick);}
+  }
+}
+function updateFrPanel(){
+  document.getElementById('fr-turn-dot').style.background=frTurn==='w'?'#f0f0f0':'#222';
+  document.getElementById('fr-turn-text').textContent=frTurn==='w'?'Vez das Brancas':'Vez das Pretas';
+  const list=document.getElementById('fr-moves');list.innerHTML='';
+  for(let i=0;i<frHistory.length;i+=2){
+    const row=document.createElement('div');row.className='move-row';
+    const w=frHistory[i],b=frHistory[i+1];
+    row.innerHTML=`<span class="move-num">${i/2+1}.</span><span class="move-pill">${w.san}</span>${b?`<span class="move-pill">${b.san}</span>`:''}`;
+    list.appendChild(row);
+  }
+  list.scrollTop=list.scrollHeight;
+}
+function frUndo(){
+  if(!frHistory.length)return;
+  frHistory.pop();frTurn=frTurn==='w'?'b':'w';
+  frBoard=freshBoard();const h=[...frHistory];frHistory=[];
+  h.forEach(()=>{});
+  frBoard=freshBoard();frLastMove=null;
+  updateFrPanel();renderBoardEl(frBoard,'free-board',null,null,null,frClick);
+}
+function frNew(){frInit();}
+
+// ── TABS ──
+function switchTab(tab){
+  ['dashboard','openings','puzzles','free'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+  });
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['dashboard','openings','puzzles','free'][i]===tab));
+  if(tab==='openings'){selectOp(opIdx);}
+  else if(tab==='puzzles'){loadPuzzle();}
+  else if(tab==='free'){frInit();}
+}
+
+// ── INIT ──
+const opList=document.getElementById('op-list');
+OPENINGS.forEach((op,i)=>{
+  const btn=document.createElement('button');btn.className='op-btn'+(i===0?' active':'');
+  btn.textContent=op.name;btn.onclick=()=>selectOp(i);opList.appendChild(btn);
+});
+selectOp(0);
+loadPuzzle();
+frInit();
+
+// Tenta carregar dados guardados
+fetch(`${API}/data`).then(r=>r.json()).then(d=>{
+  if(d.username){
+    document.getElementById('username-input').value=d.username;
+    document.getElementById('badge-name').textContent=d.username;
+    document.getElementById('badge-games').textContent=`${d.total_games||0} partidas`;
+    document.getElementById('user-badge').style.display='flex';
+    if(d.weaknesses&&d.weaknesses.length)renderDashboard(d);
+  }
+}).catch(()=>{});
+</script>
+</body>
+</html>

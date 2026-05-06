@@ -1,0 +1,6 @@
+estudar pra poder fazer certos projectos em python:
+1 -  open cv
+2- pyzbar
+
+credenciais de professor falso:
+

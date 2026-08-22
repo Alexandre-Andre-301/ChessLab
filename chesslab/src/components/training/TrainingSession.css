@@ -1,0 +1,90 @@
+.training-session {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.session-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--social-bg);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.session-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.session-hint {
+  font-size: 15px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.session-hint.wrong {
+  color: #e5484d;
+}
+
+.session-board {
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.15s ease;
+}
+
+.session-board.board-wrong {
+  animation: shake 0.35s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-7px); }
+  50% { transform: translateX(7px); }
+  75% { transform: translateX(-5px); }
+}
+
+.session-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.session-counter {
+  font-size: 14px;
+  opacity: 0.75;
+}
+
+.session-feedback {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.session-feedback.ok {
+  color: #30a46c;
+}
+
+.session-feedback.ko {
+  color: #e5484d;
+}
+
+.session-summary {
+  max-width: 420px;
+  margin: 48px auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.session-score {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--text-h);
+}

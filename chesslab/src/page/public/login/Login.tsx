@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
-import { RegisterForm } from '../../../components/forms/RegisterForm'
+import { LoginForm } from '../../../components/forms/LoginForm'
 import { GuestRoute } from '../../../components/routing/Guards'
 import '../../../styles/auth.css'
 
-export const Cadastro = () => {
+export const Login = () => {
   return (
     <GuestRoute>
       <main className="auth-page">
@@ -11,13 +11,13 @@ export const Cadastro = () => {
           {/* substitui este bloco pelo teu logótipo */}
           <div className="auth-logo" aria-hidden="true" />
 
-          <h1>Criar conta</h1>
-          <p className="auth-subtitle">Começa a analisar as tuas partidas de xadrez.</p>
+          <h1>Entrar</h1>
+          <p className="auth-subtitle">Bem-vindo de volta ao ChessLab.</p>
 
-          <RegisterForm />
+          <LoginForm />
 
           <p className="auth-switch">
-            Já tens conta? <Link to="/login">Entrar</Link>
+            Ainda não tens conta? <Link to="/cadastro">Criar conta</Link>
           </p>
         </div>
       </main>

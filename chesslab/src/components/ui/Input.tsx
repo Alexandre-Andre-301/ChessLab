@@ -1,13 +1,5 @@
-type inputProp = {
-    type : string
-    placeholder ?: string
-}
+import type { ComponentProps } from 'react'
 
-export const Input = ({type , placeholder}: inputProp )=>{
-
-    return(
-        <input type={type} placeholder={placeholder} />
-
-    )
-
+export const Input = ({ type = 'text', ...props }: ComponentProps<'input'>) => {
+  return <input className="form-input" type={type} {...props} />
 }

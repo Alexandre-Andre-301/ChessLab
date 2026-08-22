@@ -1,0 +1,91 @@
+.home-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-worst {
+  font-size: 26px;
+}
+
+.stat-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.stat-link:hover {
+  text-decoration: underline;
+}
+
+.openings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.empty-card {
+  max-width: 480px;
+  text-align: left;
+}
+
+.empty-card h2 {
+  margin-bottom: 6px;
+}
+
+.empty-card .sync-status {
+  margin-top: 10px;
+}
+
+.openings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.openings-table th,
+.openings-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.openings-table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text);
+}
+
+.openings-name {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-h);
+}
+
+.openings-eco {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 2px 6px;
+  font-family: var(--mono);
+  font-size: 12px;
+  border-radius: 4px;
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+td.win {
+  color: #30a46c;
+}
+
+td.loss {
+  color: #e5484d;
+}
+
+td.draw {
+  opacity: 0.75;
+}

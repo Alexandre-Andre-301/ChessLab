@@ -1,12 +1,9 @@
-interface buttonProp extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    message : string
-    type ?: "submit" | "reset" | "button"
-}
+import type { ComponentProps } from 'react'
 
-export const Button = ({ message, type }: buttonProp) => {
-    return (
-    <button type={type}>
-        {message}
+export const Button = ({ type = 'button', children, ...props }: ComponentProps<'button'>) => {
+  return (
+    <button className="form-button" type={type} {...props}>
+      {children}
     </button>
-    )
+  )
 }

@@ -1,36 +1,30 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { registerSchema, type RegisterFormData } from '../../schemas/registerSchema'
-import { useRegister } from '../../hooks/useRegister'
+import { authSchema, type LoginFormData } from '../../schemas/authSchema'
+import { useLogin } from '../../hooks/useLogin'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 
-export const RegisterForm = () => {
+export const LoginForm = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(authSchema),
   })
 
-  const mutation = useRegister()
+  const mutation = useLogin()
 
-  const onSubmit = (data: RegisterFormData) => {
+  const onSubmit = (data: LoginFormData) => {
     mutation.mutate(data)
   }
 
   return (
     <form className="auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
       <div className="form-field">
-        <label htmlFor="full_name">Nome completo</label>
-        <Input id="full_name" type="text" placeholder="O teu nome" {...register('full_name')} />
-        {errors.full_name && <p className="form-error">{errors.full_name.message}</p>}
-      </div>
-
-      <div className="form-field">
         <label htmlFor="email">Email</label>
-        <Input id="email" type="email" placeholder="exemplo@email.com" {...register('email')} />
+        <Input id="email" type="email" placeholder="grandmaster@email.com" {...register('email')} />
         {errors.email && <p className="form-error">{errors.email.message}</p>}
       </div>
 
@@ -43,7 +37,7 @@ export const RegisterForm = () => {
       {mutation.isError && <p className="form-error">{mutation.error.message}</p>}
 
       <Button type="submit" disabled={mutation.isPending}>
-        {mutation.isPending ? 'A criar conta...' : 'Criar conta'}
+        {mutation.isPending ? 'A entrar...' : 'Entrar'}
       </Button>
     </form>
   )

@@ -380,6 +380,219 @@
   margin-bottom: 16px;
 }
 
+/* ---------- cursos por família de abertura ---------- */
+
+.family-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.family-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.family-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.family-name {
+  margin: 0;
+  font-size: 16.5px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.family-meta {
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.family-train {
+  padding: 8px 14px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.theory-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 0;
+  font: inherit;
+  font-size: 13.5px;
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.theory-toggle .rotated {
+  transform: rotate(180deg);
+}
+
+.theory-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--social-bg);
+}
+
+.theory-line {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.theory-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.theory-moves {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  opacity: 0.85;
+}
+
+.family-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* ---------- lista de partidas ---------- */
+
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.filter-select {
+  max-width: 220px;
+}
+
+.games-card {
+  padding: 8px;
+}
+
+.game-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.game-row:hover {
+  background: var(--social-bg);
+}
+
+.game-row + .game-row {
+  border-top: 1px solid var(--border);
+}
+
+.game-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.game-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.game-opponent {
+  color: var(--text-h);
+  font-weight: 500;
+  font-size: 14.5px;
+}
+
+.game-sub {
+  font-size: 12.5px;
+  opacity: 0.7;
+}
+
+.game-side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.game-result-text.win,
+.recent-meta .win {
+  color: #30a46c;
+}
+
+.game-result-text.loss {
+  color: #e5484d;
+}
+
+.game-result-text.draw {
+  opacity: 0.75;
+}
+
+.load-more {
+  width: 100%;
+  margin-top: 12px;
+}
+
+/* ---------- insights ---------- */
+
+.insight-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.insight-title {
+  font-size: 17px;
+  margin: 0 0 6px;
+}
+
+.insight-weakness .insight-head {
+  color: #e5484d;
+}
+
+.insight-strength .insight-head {
+  color: #30a46c;
+}
+
+.insight-trend .insight-head {
+  color: var(--accent);
+}
+
+.insight-pattern .insight-head {
+  color: #d97706;
+}
+
 @media (max-width: 640px) {
   .training-name {
     white-space: normal;

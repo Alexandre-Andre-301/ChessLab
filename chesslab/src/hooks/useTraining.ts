@@ -12,6 +12,16 @@ export const useTrainingOverview = () => {
   })
 }
 
+export const useTrainingFamilies = () => {
+  const token = useAuthStore((state) => state.token)
+
+  return useQuery({
+    queryKey: ['training-families'],
+    queryFn: () => trainingService.families(token!),
+    enabled: !!token,
+  })
+}
+
 export const useGenerateCards = () => {
   const token = useAuthStore((state) => state.token)
   const queryClient = useQueryClient()
@@ -20,6 +30,7 @@ export const useGenerateCards = () => {
     mutationFn: () => trainingService.generate(token!),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['training-overview'] })
+      queryClient.invalidateQueries({ queryKey: ['training-families'] })
     },
   })
 }

@@ -7,7 +7,9 @@ import {
   LogOut,
   Menu,
   Puzzle,
+  Search,
   Settings,
+  Swords,
   User,
   X,
 } from 'lucide-react'
@@ -16,9 +18,11 @@ import './AppLayout.css'
 
 const NAV_ITEMS = [
   { to: '/', label: 'Início', icon: LayoutDashboard },
-  { to: '/perfil', label: 'Perfil', icon: User },
+  { to: '/partidas', label: 'Partidas', icon: Swords },
+  { to: '/insights', label: 'Insights', icon: Search },
   { to: '/treino-aberturas', label: 'Treino de Aberturas', icon: BookOpen },
   { to: '/puzzles', label: 'Puzzles', icon: Puzzle },
+  { to: '/perfil', label: 'Perfil', icon: User },
   { to: '/configuracoes', label: 'Configurações', icon: Settings },
 ]
 

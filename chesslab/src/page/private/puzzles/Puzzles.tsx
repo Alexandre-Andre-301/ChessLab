@@ -34,6 +34,7 @@ export const Puzzles = () => {
       <div className="page">
         <TrainingSession
           key={sessionCards[0]?.id ?? 'empty'}
+          streakDays={overview?.streak_days}
           type="puzzle"
           cards={sessionCards}
           onFinish={() => {

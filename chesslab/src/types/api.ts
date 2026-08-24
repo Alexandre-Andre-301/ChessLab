@@ -50,8 +50,10 @@ export interface TrainingOverview {
 export interface FamilyStat {
   family: string
   eco: string | null
+  color: 'white' | 'black'
   total: number
   due: number
+  mastery: number
 }
 
 export interface BookLine {
@@ -70,11 +72,23 @@ export interface LineSession {
   user_color: 'white' | 'black'
   san_moves: string[]
   uci_moves: string[]
+  unlocked_plies: number
+  times_completed: number
+  level_plies: number
+}
+
+export interface LineCompleteResult {
+  unlocked_plies: number
+  total_plies: number
+  leveled_up: boolean
+  times_completed: number
+  best_mistakes: number
 }
 
 export interface LineCheckResult {
   status: 'book' | 'engine_ok' | 'wrong' | 'illegal'
   message?: string | null
+  tip?: string | null
   next_uci?: string | null
   best_san?: string
 }
@@ -89,20 +103,46 @@ export interface ReviewCardSummary {
   card_type: 'opening' | 'puzzle'
   fen: string
   opening_eco: string | null
+  family: string | null
+  color: string | null
   repetitions: number
   interval_days: number
   occurrences: number
   line_moves: string[]
   explanation: string | null
+  mastery: number
+  streak: number
+  lapses: number
+  status: CardStatus
+}
+
+export interface BrowseCard extends ReviewCardSummary {
+  correct_move: string
 }
 
 export interface AnswerResult {
   correct: boolean
+  hinted?: boolean
   correct_move: string
   interval_days: number
   next_review_at: string
   streak_days?: number
+  mastery: number
+  mastery_before: number
   message?: string | null
+  tip?: string | null
+}
+
+export interface HintResult {
+  piece: string
+  square_hint: string
+}
+
+export type CardStatus = 'learning' | 'review' | 'mastered'
+
+export interface BrowseCard extends ReviewCardSummary {
+  correct_move: string
+  status: CardStatus
 }
 
 export interface GameSummary {

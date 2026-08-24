@@ -19,4 +19,12 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // código gerado pelo shadcn/ui — não editar à mão
+    files: ['src/components/ui/**', 'src/hooks/use-mobile.ts'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+    },
+  },
 ])

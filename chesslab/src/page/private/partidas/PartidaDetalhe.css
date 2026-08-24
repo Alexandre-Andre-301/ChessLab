@@ -1,8 +1,8 @@
-.back-link {
+﻿.back-link {
   display: inline-block;
   margin-bottom: 12px;
   font-size: 14px;
-  color: var(--accent);
+  color: var(--brand);
   text-decoration: none;
 }
 
@@ -50,7 +50,7 @@
 }
 
 .replay-controls button:hover:not(:disabled) {
-  border-color: var(--accent-border);
+  border-color: var(--brand-border);
 }
 
 .replay-controls button:disabled {
@@ -92,9 +92,9 @@
 }
 
 .move-cell.current {
-  background: var(--accent-bg);
-  border-color: var(--accent-border);
-  color: var(--accent);
+  background: var(--brand-bg);
+  border-color: var(--brand-border);
+  color: var(--brand);
   font-weight: 600;
 }
 

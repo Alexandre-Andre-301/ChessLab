@@ -1,9 +1,10 @@
-import { useForm } from 'react-hook-form'
+﻿import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { registerSchema, type RegisterFormData } from '../../schemas/registerSchema'
 import { useRegister } from '../../hooks/useRegister'
-import { Button } from '../ui/Button'
-import { Input } from '../ui/Input'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 export const RegisterForm = () => {
   const {
@@ -21,28 +22,52 @@ export const RegisterForm = () => {
   }
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
-      <div className="form-field">
-        <label htmlFor="full_name">Nome completo</label>
-        <Input id="full_name" type="text" placeholder="O teu nome" {...register('full_name')} />
-        {errors.full_name && <p className="form-error">{errors.full_name.message}</p>}
+    <form className="flex flex-col gap-4 text-left" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="full_name">Nome completo</Label>
+        <Input
+          id="full_name"
+          type="text"
+          className="h-10 bg-card"
+          placeholder="O teu nome"
+          {...register('full_name')}
+        />
+        {errors.full_name && (
+          <p className="text-[13px] text-destructive">{errors.full_name.message}</p>
+        )}
       </div>
 
-      <div className="form-field">
-        <label htmlFor="email">Email</label>
-        <Input id="email" type="email" placeholder="exemplo@email.com" {...register('email')} />
-        {errors.email && <p className="form-error">{errors.email.message}</p>}
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          className="h-10 bg-card"
+          placeholder="exemplo@email.com"
+          {...register('email')}
+        />
+        {errors.email && <p className="text-[13px] text-destructive">{errors.email.message}</p>}
       </div>
 
-      <div className="form-field">
-        <label htmlFor="password">Password</label>
-        <Input id="password" type="password" placeholder="••••••••" {...register('password')} />
-        {errors.password && <p className="form-error">{errors.password.message}</p>}
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="password">Password</Label>
+        <Input
+          id="password"
+          type="password"
+          className="h-10 bg-card"
+          placeholder="••••••••"
+          {...register('password')}
+        />
+        {errors.password && (
+          <p className="text-[13px] text-destructive">{errors.password.message}</p>
+        )}
       </div>
 
-      {mutation.isError && <p className="form-error">{mutation.error.message}</p>}
+      {mutation.isError && (
+        <p className="text-[13px] text-destructive">{mutation.error.message}</p>
+      )}
 
-      <Button type="submit" disabled={mutation.isPending}>
+      <Button type="submit" disabled={mutation.isPending} className="h-10">
         {mutation.isPending ? 'A criar conta...' : 'Criar conta'}
       </Button>
     </form>
